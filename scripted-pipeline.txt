@@ -1,0 +1,21 @@
+node('master') {
+    stage('continuous downloads') {
+    git 'https://github.com/pmmanoj650/java-demo-project.git'
+}
+    stage('continuous build') {
+    sh 'mvn package'
+}
+    stage('continuous deployment to test environment') {
+    sh 'scp /var/lib/jenkins/workspace/Development/webapp/target/webapp.war root@172.31.87.47:/var/lib/tomcat9/webapps/testenv.war'
+}
+   stage('continuos testing') {
+   git 'https://github.com/pmmanoj650/Testing.git'
+   sh 'java -jar /var/lib/jenkins/workspace/Development/testing.jar'
+   
+}
+  stage('continuoes deployment to prod env') {
+  input 'waiting for approval from the DMadmin'
+  sh 'scp /var/lib/jenkins/workspace/Development/webapp/target/webapp.war root@172.31.92.72:/var/lib/tomcat9/webapps/prodenv.war'
+}
+    
+}
